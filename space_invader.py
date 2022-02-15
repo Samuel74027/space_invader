@@ -53,33 +53,55 @@ class Spaceship(Element):
     def stop_move(self, event):
         if event == pygame.K_d or event == pygame.K_a:
             self.x = 0
+    def update(self):
+        screen.blit(self.img, (self.x, self.y))
 
-class Block(Element):
+class Block():
     BLOCK_LIST = []
+    X_LIST = []
+    Y_LIST = []
+    COLOR_LIST = []
     XSPEED = 5
     YSPEED = 3
-    def __init__(self, x, y):
-        super().__init__(x, y)
-    def add_block(self):
-        RED = random.randint(0, 255)
-        GREEN = random.randint(0, 255)
-        BLUE = random.randint(0, 255)
-        new_block = pygame.Surface((50, 50))
-        new_block.fill((RED, GREEN, BLUE))
-        self.BLOCK_LIST.append(new_block)
-        return self.BLOCK_LIST
+    num_of_blocks = 8
+    def __init__(self):
+        pass
+    def create_block(self):
+        i = 0
+        for i in range(self.num_of_blocks):
+            RED = random.randint(0, 255)
+            GREEN = random.randint(0, 255)
+            BLUE = random.randint(0, 255)
+            color = (RED,GREEN,BLUE)
+            self.COLOR_LIST.append(color)
+            new_block = pygame.Surface((50, 50))
+            new_block.fill((RED, GREEN, BLUE))
+            self.BLOCK_LIST.append(new_block)
+            block_x = random.randint(0,SCREEN_WIDTH - 55)
+            block_y = random.randint(0,SCREEN_HEIGHT - 40)
+            self.X_LIST.append(block_x)
+            self.Y_LIST.append(block_y)
     def move_block(self):
-        for block in self.BLOCK_LIST:
-            block.get_rect().top += self.YSPEED
-            block.get_rect().left += self.XSPEED
-            screen.blit(block)
-
-
+        for i in range(self.num_of_blocks):
+            self.X_LIST[i] += self.XSPEED
+            self.Y_LIST[i] += self.YSPEED
+            if self.Y_LIST[i] < 0 or self.Y_LIST[i] > SCREEN_HEIGHT:
+                self.Y_LIST[i] -= self.YSPEED
+            if self.X_LIST[i]  < 0 or self.X_LIST[i]  > SCREEN_WIDTH:
+                self.X_LIST[i] -= self.XSPEED
+    def update(self):
+        for i in range(self.num_of_blocks):
+            screen.blit(self.BLOCK_LIST[i], (self.X_LIST[i], self.Y_LIST[i]))
+                
+            
+blocks = Block()
+blocks.create_block()
 spaceship = Spaceship(spaceship_image, START_X, START_Y)
 # Starting Coordinate
 
 
-delta_x = 0
+delta_x = 1
+block_x = 0
 def Invader(img, x, y):
     screen.blit(img, (x, y))
 
@@ -91,15 +113,20 @@ while running:
     screen.blit(invader_image, (random_x, random_y))
     block = pygame.Surface((50, 50))
     block.fill((255, 0, 0))
-    screen.blit(block, (random_x, random_y))
+    screen.blit(block, (block_x, 100))
+    block_x += delta_x
+    blocks.move_block()
     #input events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             spaceship.move(event.key)
+            print('move up')
         if event.type == pygame.KEYUP:
             spaceship.stop_move(event.key)
+    spaceship.update()
+    blocks.update()
 
     pygame.display.update()
 
