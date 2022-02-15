@@ -7,6 +7,7 @@
 #                                                                 #
 ###################################################################
 #Import library
+from ast import Num
 import pygame, math, sys
 import random
 
@@ -93,7 +94,42 @@ class Block():
         for i in range(self.num_of_blocks):
             screen.blit(self.BLOCK_LIST[i], (self.X_LIST[i], self.Y_LIST[i]))
                 
-            
+ 
+class Invader():
+    Invader_list = []
+    InvaderX = []
+    InvaderY = []
+    XCHANGE = 5
+    YCHANGE = 50
+    def __init__(self, numOfInvaders):
+        self.numOfInvaders = numOfInvaders
+    def create_invader(self):
+        for invader in range(self.numOfInvaders):
+            x = 0
+            self.Invader_list.append(invader_image)
+            self.InvaderX.append(x)
+            self.InvaderY.append(0)
+            x += 100
+    def move(self):
+        for i in range(len(self.Invader_list)):
+            if i == 0:
+                pass
+            else:
+                pygame.time.delay(50)
+            self.InvaderX[i] += self.XCHANGE
+            if self.InvaderX[i] <= 0:
+                self.XCHANGE = 5
+                self.InvaderY[i] += self.YCHANGE
+            elif self.InvaderX[i] >= SCREEN_WIDTH:
+                self.XCHANGE = -5
+                self.InvaderY[i] += self.YCHANGE
+    def update(self):
+        for i in range(self.numOfInvaders):
+            screen.blit(self.Invader_list[i], (self.InvaderX[i], self.InvaderY[i]))
+    
+invaders = Invader(2)
+invaders.create_invader()  
+               
 blocks = Block()
 blocks.create_block()
 spaceship = Spaceship(spaceship_image, START_X, START_Y)
@@ -110,12 +146,9 @@ running = True
 while running:
     # redraw game Screen
     screen.blit(background, (0, 0))
-    screen.blit(invader_image, (random_x, random_y))
     block = pygame.Surface((50, 50))
-    block.fill((255, 0, 0))
-    screen.blit(block, (block_x, 100))
-    block_x += delta_x
-    blocks.move_block()
+    invaders.move()
+    invaders.update()
     #input events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -126,8 +159,6 @@ while running:
         if event.type == pygame.KEYUP:
             spaceship.stop_move(event.key)
     spaceship.update()
-    blocks.update()
-
     pygame.display.update()
 
 # add boundaries and moving opponent to the screen, make the countrol system into the function and make the code organize
