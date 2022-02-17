@@ -116,7 +116,7 @@ class Block():
     def update(self):
         for i in range(self.num_of_blocks):
             screen.blit(self.BLOCK_LIST[i], (self.X_LIST[i], self.Y_LIST[i]))
-                
+              
  
 class Invader():
     Invader_list = []
@@ -132,7 +132,7 @@ class Invader():
             x = random.randint(0, SCREEN_WIDTH - 55)
             y = random.randint(0, SCREEN_HEIGHT - 40)
             delta_x = 5
-            delta_y = 10
+            delta_y = 7
             self.Invader_list.append(invader_image)
             self.InvaderX.append(x)
             self.InvaderY.append(y)
@@ -146,19 +146,22 @@ class Invader():
             elif self.InvaderX[i] >= SCREEN_WIDTH - 40:
                 self.xChangeList[i] = -5
             if self.InvaderY[i] <= 0:
-                self.yChangeList[i] = 10
+                self.yChangeList[i] = 7
             elif self.InvaderY[i] >= SCREEN_HEIGHT - 55:
-                self.yChangeList[i] = -10
+                self.yChangeList[i] = -7
             delta_x = self.xChangeList[i]
             delta_y = self.yChangeList[i]
             self.InvaderX[i] += delta_x
             self.InvaderY[i] += delta_y
     def update(self):
+        killedInvader = 0  
         for i in range(0, numOfInvaders):
             if self.InvaderState[i] == True:
                 screen.blit(self.Invader_list[i], (self.InvaderX[i], self.InvaderY[i]))
+                killedInvader += 1
+        return killedInvader
 
-def Collision(self, bulletX, bulletY, invaderX, invaderY):
+def Collision(bulletX, bulletY, invaderX, invaderY):
     xDifference = (bulletX - invaderX)**2
     yDifference = (bulletY - invaderY)**2
     dDifference = (xDifference + yDifference)**0.5
@@ -166,10 +169,19 @@ def Collision(self, bulletX, bulletY, invaderX, invaderY):
         return True
     else:
         return False
-  
 numOfInvaders = 5   
 invaders = Invader(numOfInvaders)
-invaders.create_invader()  
+invaders.create_invader()
+
+
+def Writetext(text, x, y, fontSize):
+    font = pygame.font.Font('freesansbold.ttf', fontSize) 
+    #(0, 0, 0) is black, to make black text
+    text = font.render(text, True, (255, 255, 255)) 
+    textRect = text.get_rect()
+    textRect.center = (x, y) 
+    return (text, textRect)
+
 blocks = Block()
 blocks.create_block()
 # Starting Coordinate
@@ -223,10 +235,16 @@ while running:
         bullet.move(bulletState)
         bullet.update()
         for i in range(0, numOfInvaders):
-            if Collision(True, bullet.bulletX, bullet.bulletY, invaders.InvaderX[i], invaders.InvaderY[i]):
+            if Collision(bullet.bulletX, bullet.bulletY, invaders.InvaderX[i], invaders.InvaderY[i]):
                 bulletState = False
                 invaders.InvaderState[i] = False
-             
+                
+
+    points = Writetext(f'Points: {numOfInvaders - invaders.update()}', 900, 50, 30)
+    screen.blit(points[0], (points[1])) 
+    if numOfInvaders - invaders.update() == numOfInvaders:
+        win = Writetext('You Win!!', SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 50)
+        screen.blit(win[0], (win[1]))      
     #collision detection
     pygame.display.update()
 
