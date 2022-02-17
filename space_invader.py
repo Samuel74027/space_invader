@@ -2,8 +2,8 @@
 #                                                                 #
 #               Program 1 - By Yen-Lin Lee                        #
 #                last revised: 10/18/21                           #
-#           This program can prints out user's favorite number    #
-#                                                                 #
+#           You are died when your health is 0. Invader will      #
+#           bounce around the screen. Try to kill all of them!    #
 #                                                                 #
 ###################################################################
 #Import library
@@ -131,7 +131,7 @@ class Invader():
     def create_invader(self):
         for invader in range(self.numOfInvaders):
             x = random.randint(0, SCREEN_WIDTH - 55)
-            y = random.randint(0, SCREEN_HEIGHT - 40)
+            y = random.randint(0, SCREEN_HEIGHT - 300)
             delta_x = 5
             delta_y = 7
             self.Invader_list.append(invader_image)
@@ -221,13 +221,13 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_d:
-                delta_x += 3
+                delta_x += 5
             if event.key == pygame.K_a:
-                delta_x = -3
+                delta_x = -5
             if event.key == pygame.K_s:
-                delta_y = 3
+                delta_y = 5
             if event.key == pygame.K_w:
-                delta_y = -3
+                delta_y = -5
             if event.key == pygame.K_SPACE:
                 bullet = Bullet(spaceship1.x + 10, spaceship1.y, bullet_image)
                 bulletState = True
