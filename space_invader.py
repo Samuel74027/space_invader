@@ -40,9 +40,10 @@ class Element():
 
 
 class Spaceship(Element):
-    def __init__(self, img, x, y):
+    def __init__(self, img, x, y, health):
         super().__init__(x, y)
         self.img = img
+        self.health = health
     def move(self, event):
         delta_x = 0
         delta_y = 0
@@ -64,7 +65,7 @@ class Spaceship(Element):
     def update(self):
         screen.blit(self.img, (self.x, self.y))
 
-spaceship1 = Spaceship(spaceship_image, (SCREEN_WIDTH - 55)/2, 500)
+spaceship1 = Spaceship(spaceship_image, (SCREEN_WIDTH - 55)/2, 500, 10)
 
 class Bullet():
     def __init__(self, bulletX, bulletY, img):
@@ -161,11 +162,19 @@ class Invader():
                 killedInvader += 1
         return killedInvader
 
-def Collision(bulletX, bulletY, invaderX, invaderY):
+def BulletCollision(bulletX, bulletY, invaderX, invaderY):
     xDifference = (bulletX - invaderX)**2
     yDifference = (bulletY - invaderY)**2
     dDifference = (xDifference + yDifference)**0.5
     if dDifference < 30:
+        return True
+    else:
+        return False
+def SpaceshipCollision(spaceX, spaceY, invaderX, invaderY):
+    xDifference = (spaceX - invaderX)**2
+    yDifference = (spaceY - invaderY)**2
+    dDifference = (xDifference + yDifference)**0.5
+    if dDifference < 20:
         return True
     else:
         return False
@@ -235,16 +244,25 @@ while running:
         bullet.move(bulletState)
         bullet.update()
         for i in range(0, numOfInvaders):
-            if Collision(bullet.bulletX, bullet.bulletY, invaders.InvaderX[i], invaders.InvaderY[i]):
+            if BulletCollision(bullet.bulletX, bullet.bulletY, invaders.InvaderX[i], invaders.InvaderY[i]):
                 bulletState = False
                 invaders.InvaderState[i] = False
+    for i in range(0, numOfInvaders):
+        if SpaceshipCollision(spaceship1.x, spaceship1.y, invaders.InvaderX[i], invaders.InvaderY[i]):
+            spaceship1.health -= 1
                 
 
     points = Writetext(f'Points: {numOfInvaders - invaders.update()}', 900, 50, 30)
-    screen.blit(points[0], (points[1])) 
+    screen.blit(points[0], (points[1]))
+    health = Writetext(f'Health: {spaceship1.health}', 900, 70, 30) 
+    screen.blit(health[0], (health[1]))
     if numOfInvaders - invaders.update() == numOfInvaders:
         win = Writetext('You Win!!', SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 50)
-        screen.blit(win[0], (win[1]))      
+        screen.blit(win[0], (win[1]))
+    if spaceship1.health <= 0:
+        loss = Writetext('You are died...', SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 50) 
+        screen.blit(loss[0], loss[1]) 
+        spaceship1.health = 0    
     #collision detection
     pygame.display.update()
 
