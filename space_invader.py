@@ -14,6 +14,7 @@ import random
 # Screen constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 600
 BLACK = (0, 0, 0)
+
 #Setup Screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Space Invader')
@@ -33,15 +34,11 @@ SPACESHIP_WIDTH, SPACESHIP_HEIGHT= 55,40
 spaceship_image = pygame.transform.scale(spaceship_image, (SPACESHIP_HEIGHT, SPACESHIP_WIDTH))
 START_X, START_Y = (SCREEN_WIDTH - SPACESHIP_WIDTH)/2, (SCREEN_HEIGHT)/2
 
-class Element():
-    def __init__(self, x, y):
+# class for spaceship
+class Spaceship():
+    def __init__(self, img, x, y, health):
         self.x = x
         self.y = y
-
-
-class Spaceship(Element):
-    def __init__(self, img, x, y, health):
-        super().__init__(x, y)
         self.img = img
         self.health = health
     def move(self, event):
@@ -67,6 +64,7 @@ class Spaceship(Element):
 
 spaceship1 = Spaceship(spaceship_image, (SCREEN_WIDTH - 55)/2, 500, 10)
 
+# class for bullets
 class Bullet():
     def __init__(self, bulletX, bulletY, img):
         self.bulletX = bulletX
@@ -81,7 +79,8 @@ class Bullet():
     def update(self):
         screen.blit(self.img, (self.bulletX, self.bulletY))
 
-class Block():
+# code below are the code I developed but not used
+""" class Block():
     BLOCK_LIST = []
     X_LIST = []
     Y_LIST = []
@@ -117,8 +116,31 @@ class Block():
     def update(self):
         for i in range(self.num_of_blocks):
             screen.blit(self.BLOCK_LIST[i], (self.X_LIST[i], self.Y_LIST[i]))
-              
- 
+
+class Bomb():
+    Bomb_list = []
+    BombX = []
+    BombY = []
+    def __init__(self):
+        pass
+    def createBomb(self, bombX, bombY):
+        self.Bomb_list.append(bomb_image)
+        self.BombX.append(bombX)
+        self.BombY.append(bombY)
+    def move(self, bombState):
+        if bombState == True:
+            for i in range(0, len(self.Bomb_list)):
+                delta_x = 0
+                delta_y = 10
+                self.BombY[i] += delta_y
+                
+    def update(self):
+        for i in range(0, len(self.Bomb_list)):
+            screen.blit(self.Bomb_list[i], (self.BombX[i], self.BombY[i]))
+
+bombState = False """
+
+# invader class
 class Invader():
     Invader_list = []
     InvaderState = []
@@ -162,6 +184,7 @@ class Invader():
                 killedInvader += 1
         return killedInvader
 
+# function for detecting collisions
 def BulletCollision(bulletX, bulletY, invaderX, invaderY):
     xDifference = (bulletX - invaderX)**2
     yDifference = (bulletY - invaderY)**2
@@ -170,6 +193,8 @@ def BulletCollision(bulletX, bulletY, invaderX, invaderY):
         return True
     else:
         return False
+    
+
 def SpaceshipCollision(spaceX, spaceY, invaderX, invaderY):
     xDifference = (spaceX - invaderX)**2
     yDifference = (spaceY - invaderY)**2
@@ -178,11 +203,13 @@ def SpaceshipCollision(spaceX, spaceY, invaderX, invaderY):
         return True
     else:
         return False
+
+# the number of invaders can be changed using the variable "numOfInvaders" below
 numOfInvaders = 5   
 invaders = Invader(numOfInvaders)
 invaders.create_invader()
 
-
+# function for writing text on the screen
 def Writetext(text, x, y, fontSize):
     font = pygame.font.Font('freesansbold.ttf', fontSize) 
     #(0, 0, 0) is black, to make black text
@@ -191,9 +218,8 @@ def Writetext(text, x, y, fontSize):
     textRect.center = (x, y) 
     return (text, textRect)
 
-blocks = Block()
-blocks.create_block()
-# Starting Coordinate
+
+
 bulletState = False
 delta_x = 0
 delta_y = 0
@@ -205,6 +231,17 @@ while running:
     block = pygame.Surface((50, 50))
     invaders.move()
     invaders.update()
+    # code below are the code I developed but can't get it to work
+    """ if bombState == True:
+        bombs = Bomb()
+        for i in range(0, numOfInvaders):
+            bombs.createBomb(invaders.InvaderX[i], invaders.InvaderY[i])
+        bombs.move(bombState)
+        bombs.update()
+        bombState = False
+    else:
+        bombState = True """
+    # spaceship boundaries
     if spaceship1.x <= 0:
         spaceship1.x = 0
     if spaceship1.x >= SCREEN_WIDTH - 40:
@@ -215,7 +252,7 @@ while running:
         spaceship1.y = SCREEN_HEIGHT - 55
     spaceship1.x += delta_x
     spaceship1.y += delta_y
-    #input events
+    # spaceship control
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -239,7 +276,7 @@ while running:
     
     spaceship1.update()
     
-    #fire bullet
+    #fire bullet + detect for collisions
     if bulletState == True:
         bullet.move(bulletState)
         bullet.update()
@@ -251,7 +288,7 @@ while running:
         if SpaceshipCollision(spaceship1.x, spaceship1.y, invaders.InvaderX[i], invaders.InvaderY[i]):
             spaceship1.health -= 1
                 
-
+    # print out health and points
     points = Writetext(f'Points: {numOfInvaders - invaders.update()}', 900, 50, 30)
     screen.blit(points[0], (points[1]))
     health = Writetext(f'Health: {spaceship1.health}', 900, 70, 30) 
@@ -263,7 +300,4 @@ while running:
         loss = Writetext('You are died...', SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 50) 
         screen.blit(loss[0], loss[1]) 
         spaceship1.health = 0    
-    #collision detection
     pygame.display.update()
-
-# add boundaries and moving opponent to the screen, make the countrol system into the function and make the code organize
